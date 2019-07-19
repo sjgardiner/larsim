@@ -62,9 +62,48 @@ namespace evgen {
           [this]() -> bool { return type_() == "fixed"; }
         };
 
+        fhicl::Sequence<double, 3> min_position_ {
+          Name("min_position"),
+          Comment("The minimum allowed values for the x, y, and z coordinates"),
+          [this]() -> bool { return type_() == "box"; }
+        };
+
+        fhicl::Sequence<double, 3> max_position_ {
+          Name("max_position"),
+          Comment("The maximum allowed values for the x, y, and z coordinates"),
+          [this]() -> bool { return type_() == "box"; }
+        };
+
+        fhicl::OptionalAtom<bool> check_active_ {
+          Name("check_active"),
+          Comment("Whether to enforce that the sampled vertices are within a TPC"
+            " active volume"),
+          [this]() -> bool { return type_() == "box"; }
+        };
+
+        fhicl::Atom<double> T0_ {
+          Name("T0"),
+          Comment("Central time (s) to use for the vertex"),
+          0. // default value
+        };
+
+        fhicl::Atom<double> SigmaT_ {
+          Name("SigmaT"),
+          Comment("Variation (semi-interval or RMS) in the "
+            "time (s) to use for the vertex"),
+          0. // default value
+        };
+
+        fhicl::Atom<std::string> time_type_ {
+          Name("time_type"),
+          Comment("Technique used to select vertex times"),
+          "uniform" // default value
+        };
+
       }; // struct Config
 
       enum class vertex_type_t { kSampled, kFixed };
+      enum class time_type_t { kUniform, kGaussian };
 
       // Configuration-checking constructors
       ActiveVolumeVertexSampler(const fhicl::Table<Config>& conf,
@@ -81,7 +120,6 @@ namespace evgen {
         const geo::Geometry& geom);
 
       // Function that selects a primary vertex location for each event.
-      // TODO: add time sampling
       TLorentzVector sample_vertex_pos(const geo::Geometry& geom);
 
     protected:
@@ -91,8 +129,13 @@ namespace evgen {
       TLorentzVector fVertexPosition;
 
       vertex_type_t fVertexType;
+      time_type_t fTimeType;
 
       std::string fGeneratorName;
+
+      // Parameters for the vertex time distribution (SingleGen-like)
+      double fT0;
+      double fSigmaT;
 
       // Discrete distribution object used to sample TPCs based on their active
       // masses
