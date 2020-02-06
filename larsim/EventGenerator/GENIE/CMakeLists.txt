@@ -7,6 +7,7 @@ art_make(
           MODULE_LIBRARIES 
                         lardataalg_MCDumpers
                         larsim_Simulation lardataobj_Simulation
+                        larsim_EventGenerator_MARLEY # For ActiveVolumeVertexSampler only
                         nusimdata_SimulationBase
                         larcoreobj_SummaryData
                         larcorealg_Geometry
@@ -33,6 +34,7 @@ art_make(
                         ${ROOT_BASIC_LIB_LIST}
                         ${ROOT_EG}
                         ${LOG4CPP}
+                        ${DK2NU_TREE} # For AddGenieEventsToArtUB_module only
         )
 
 install_headers()
